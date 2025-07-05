@@ -66,8 +66,3 @@ const TodoManager = (function () {
     }
 })();
 
-const todo1 = TodoManager.createItem('Buy groceries', 'Milk, bread', 'high');
-const todo2 = TodoManager.createItem('Walk dog', 'Take Rex out', 'low');
-console.log(TodoManager.getAllTodos().length); // Should be 2
-TodoManager.deleteTodo(1);  // Delete the first todo
-console.log(TodoManager.getAllTodos().length); // Should be 1
