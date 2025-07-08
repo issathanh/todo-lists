@@ -59,7 +59,29 @@ function createTodoCard(todo){
 
     let completeBtn = document.createElement('button')
     completeBtn.textContent = 'Complete'
+    completeBtn.addEventListener('click', function(){
+        //Get the todo ID
+        const todoId = card.dataset.todoId  
 
+        //Find the todo and toggle its completion 
+        const allTodos = TodoManager.getAllTodos()
+        const currentTodo = allTodos.find( t => t.getAllInfo().id == todoId)
+
+        if (currentTodo){
+            //Toggle completion status
+            currentTodo.setComplete()
+
+            //Get updated status
+            const isComplete = currentTodo.getAllInfo().complete
+
+            //update the status text and color
+            status.textContent = isComplete ? 'Completed' : 'Incomplete'
+            status.style.color = isComplete ? 'green' : 'red'
+
+            //update button
+            completeBtn.textContent = isComplete? 'Incomplete' : 'Complete'
+        }
+    })
     let editBtn = document.createElement('button')
     editBtn.textContent = 'Edit'
     
