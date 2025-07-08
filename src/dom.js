@@ -25,6 +25,8 @@ function createTodoCard(todo){
     card.className = 'todo-card'
     //2. Add todo information (title, desccription, priority)
     const todoInfo = todo.getAllInfo()
+    card.dataset.todoId = todoInfo.id 
+
     let title = document.createElement('h2')
     title.textContent = todoInfo.title
     card.appendChild(title)
@@ -41,6 +43,19 @@ function createTodoCard(todo){
 
     let deleteBtn = document.createElement('button')
     deleteBtn.textContent = 'Delete'
+    deleteBtn.addEventListener('click', function(){
+        //Get the todo ID from the card
+        const todoId = card.dataset.todoId; 
+
+        //Delete from TodoManger
+        TodoManager.deleteTodo(todoId)
+
+        //Remove card from page
+        card.remove()
+
+        console.log('Todo delted')
+
+    })
 
     let completeBtn = document.createElement('button')
     completeBtn.textContent = 'Complete'
