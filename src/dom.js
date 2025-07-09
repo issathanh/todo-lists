@@ -73,10 +73,33 @@ document.addEventListener('DOMContentLoaded', function () {
             saveBtn.replaceWith(newEditBtn)
             cancelBtn.remove()
 
+            //Add edit functionality abck
+            newEditBtn.addEventListener('click', function(){
+                switchToEditMode(newTitleElement,newDescElement, newEditBtn, card)
+            })
+
         })
 
         cancelBtn.addEventListener('click', function(){
             //Discard changes and switch back to display mode
+            const restoredTitle = document.createElement('h2')
+            restoredTitle.textContent = originalTitle
+
+            const restoredDesc = document.createElement('p')
+            restoredDesc.textContent = originalDesc 
+
+            const restoredEditBtn = document.createElement('button')
+            restoredEditBtn.textContent = 'Edit'
+
+            titleInput.replaceWith(restoredTitle)
+            descTextarea.replaceWith(restoredDesc)
+            saveBtn.replaceWith(restoredEditBtn)
+            cancelBtn.remove()
+            //Add edit functionality back
+            restoredEditBtn.addEventListener('click', function(){
+                switchToEditMode(restoredTitle, restoredDesc, restoredEditBtn, card)
+            })
+
         })
 
     }
