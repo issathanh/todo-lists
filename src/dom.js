@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //get form reference
     const form = document.getElementById('create-todo')
 
-    function switchToEditMode(titleElement, descElement, editButton, originalData){
+    function switchToEditMode(titleElement, descElement, editButton, card){
         //Store original values for cancel functionality
         const originalTitle = titleElement.textContent 
         const originalDesc = descElement.textContent
@@ -33,6 +33,46 @@ document.addEventListener('DOMContentLoaded', function () {
         //Add Save functionality
         saveBtn.addEventListener('click', function(){
             //save the changes and switch back to display mode
+            //Get new values from inputs
+
+            const newTitle = titleInput.value.trim()
+            const newDesc = descTextarea.value.trim() //trim the white spaces before and after the word
+
+            //validate - don't allow empty title
+
+            if(!newTitle){
+                alert('Title cannot be empty')
+                return 
+            }
+
+            //update todomanager 
+            const todoId = card.dataset.todoId
+
+            //Find the todo and toggle its completion 
+            const allTodos = TodoManager.getAllTodos()
+            const currentTodo = allTodos.find(t => t.getAllInfo().id == todoId)
+
+            currentTodo.title = newTitle
+            currentTodo.description = newDesc
+
+
+            //create new display elements with updated values
+            const newTitleElement = document.createElement('h2')
+            newTitleElement.textContent = newTitle 
+
+            const newDescElement = document.createElement('p')
+            newDescElement.textContent = newDesc 
+
+            //create new edit button
+            const newEditBtn = document.createElement('button')
+            newEditBtn.textContent = 'Edit'
+
+            //Replace inputs with display elements 
+            titleInput.replaceWith(newTitleElement)
+            descTextarea.replaceWith(newDescElement)
+            saveBtn.replaceWith(newEditBtn)
+            cancelBtn.remove()
+
         })
 
         cancelBtn.addEventListener('click', function(){
@@ -107,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
         editBtn.textContent = 'Edit'
 
         editBtn.addEventListener('click', function () {
-            switchToEditMode(title, description, editBtn, todoInfo)
+            switchToEditMode(title, description, editBtn, card)
         })
 
         card.appendChild(deleteBtn)
