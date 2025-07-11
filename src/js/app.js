@@ -4,4 +4,5 @@ document.addEventListener('DOMContentLoaded', function(){
     //test gamestate 
     console.log('Game initialized!')
     GameManager.logGameState()
+    
 })

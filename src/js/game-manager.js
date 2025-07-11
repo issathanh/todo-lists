@@ -43,6 +43,7 @@ const GameManager = (function () {
 
             gameState.player.gold += goldAmount;
             console.log(`🪙 Earned ${goldAmount} gold! Total: ${gameState.player.gold}`);
+            console.log(this.logGameState())
             return goldAmount;
         }
 
