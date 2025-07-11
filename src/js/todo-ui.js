@@ -53,6 +53,10 @@ function createTodoCard(todo) {
                 //Get updated status
                 const isComplete = currentTodo.getAllInfo().complete
 
+                if(isComplete){
+                    const todoInfo = currentTodo.getAllInfo()
+                    GameManager.giveGoldReward(todoInfo.priority)
+                }
                 //update the status text and color
                 status.textContent = isComplete ? 'Completed' : 'Incomplete'
                 status.style.color = isComplete ? 'green' : 'red'
