@@ -5,7 +5,8 @@ const GameManager = (function () {
             maxHp: 30,
             energy: 3,
             maxEnergy: 3,
-            gold: 0
+            gold: 0,
+            shield: 0
         },
         boss: {
             hp: 50,
@@ -13,12 +14,7 @@ const GameManager = (function () {
             damage: 5
         },
         currentTurn: 'player',
-        inCombat: false,
-        playerHand: [],
-        availableCards: [
-            { id: 1, name: 'Strike', cost: 1, damage: 6, type: 'attack' },
-            { id: 2, name: 'Block', cost: 1, block: 5, type: 'defense' }
-        ]
+        playerHand: []
     };
 
     // Function to expose
@@ -29,9 +25,10 @@ const GameManager = (function () {
             console.log('Player Hp:', gameState.player.hp);
             console.log('Player Energy:', gameState.player.energy);
             console.log('Player Gold:', gameState.player.gold);
+            console.log('Player Shield:', gameState.player.shield)
             console.log('Boss Hp:', gameState.boss.hp);
             console.log('Current Turn:', gameState.currentTurn);
-            console.log('In Combat:', gameState.inCombat);
+
         },
         giveGoldReward: function (priority) {
             let goldAmount = 0
@@ -45,7 +42,26 @@ const GameManager = (function () {
             console.log(`🪙 Earned ${goldAmount} gold! Total: ${gameState.player.gold}`);
             console.log(this.logGameState())
             return goldAmount;
-        }
+        },
 
+        playCard: function(card)
+        {
+            
+            if (card.type ==='attack')
+            {
+                console.log('boss has been damage')
+                gameState.boss.hp -= card.attack
+                gameState.player.energy -= card.cost
+                this.logGameState()
+            }
+
+            else if(card.type ==='defense')
+            {
+                console.log('You have shield')
+                gameState.player.shield += card.defense
+                gameState.player.energy -= card.cost
+                this.logGameState()
+            }
+        }
     }
 })();  
