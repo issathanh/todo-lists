@@ -76,3 +76,16 @@ button:hover{
     /* Cards will flow left to right, wrap to the next line when needed */
 }
 
+/* Style for the due date in todo cards */
+small {
+    display: block; /* Ensure it takes its own line */
+    font-size: 14px; /* Slightly smaller than other text */
+    color: #555; /* Neutral gray for normal due dates */
+    margin-top: 10px; /* Space above the due date */
+}
+
+/* Style for overdue due dates */
+small.overdue {
+    color: #dc3545; /* Bootstrap-style red for overdue */
+    font-weight: bold; /* Emphasize overdue dates */
+}

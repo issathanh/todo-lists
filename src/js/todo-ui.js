@@ -164,12 +164,12 @@ function switchToEditMode(titleElement, descElement, editButton, card) {
         descTextarea.replaceWith(newDescElement)
         saveBtn.replaceWith(newEditBtn)
         cancelBtn.remove()
-
+        
         //Add edit functionality abck
         newEditBtn.addEventListener('click', function () {
             switchToEditMode(newTitleElement, newDescElement, newEditBtn, card)
         })
-
+        TodoManager.saveTodos()
     })
 
     cancelBtn.addEventListener('click', function () {

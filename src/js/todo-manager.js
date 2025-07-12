@@ -1,20 +1,18 @@
-//name and description will be given to use by the user
-//wrap the function to hide the counter
-
 const TodoManager = (function () {
     let todoId = 0;
     let todos = [];
-    //check if item is complete
+
+    // Check if item is complete
     const getComplete = (state) => ({
-        getComplete: () => console.log(state.complete)
+        getComplete: () => state.complete // Return the value, don’t log it
+    });
 
-    })
-
-    //toggle completion 
+    // Toggle completion
     const setComplete = (state) => ({
-        setComplete: () => state.complete = !(state.complete)
-    })
-    //get all info 
+        setComplete: () => state.complete = !state.complete
+    });
+
+    // Get all info
     const getAllInfo = (state) => ({
         getAllInfo: () => ({
             id: state.id,
@@ -22,104 +20,165 @@ const TodoManager = (function () {
             description: state.description,
             priority: state.priority,
             complete: state.complete,
-            createdDate: state.createdDate
+            createdDate: state.createdDate,
+            dueDate: state.dueDate // Include dueDate
         })
-    })
-    //return the whole array
+    });
+
+    // Return the whole array
     function getAllTodos() {
-        return todos
+        return todos;
     }
 
-    //delete todo by id
+    // Delete todo by id
     function deleteTodo(id) {
         console.log('Trying to delete ID:', id, 'Type:', typeof id);
-
-        //find the index of the todo with matching ID
-        const index = todos.findIndex(todo => {
-            const todoId = todo.getAllInfo().id;
-            return todoId == id; 
-        });
-
+        const index = todos.findIndex(todo => todo.getAllInfo().id == id);
         console.log('Found index:', index);
-
         if (index !== -1) {
-            todos.splice(index, 1) // remove 1 item at that index 
-            saveTodos()
+            todos.splice(index, 1);
+            saveTodos();
             console.log('Todo deleted and saved');
         } else {
             console.log('Todo not found!');
         }
-
     }
-    function createItem(title, description, priority) {
-        todoId++;
 
+    function createItem(title, description, priority, dueDate) {
+        todoId++;
         let state = {
             id: todoId,
             title: title,
             description: description,
             priority: priority,
             complete: false,
-            createdDate: new Date()
+            createdDate: new Date(),
+            dueDate: dueDate ? new Date(dueDate) : null // Include dueDate in state
         };
 
         const newTodo = Object.assign(
+            {},
+            { 
+                title, 
+                description, 
+                priority, 
+                complete: false, 
+                createdDate: new Date(), 
+                dueDate: state.dueDate,
+                state // Include state for internal updates
+            },
             getComplete(state),
             setComplete(state),
             getAllInfo(state)
         );
+
+        // Sync direct properties with state
+        Object.defineProperties(newTodo, {
+            title: {
+                get: () => state.title,
+                set: (value) => state.title = value
+            },
+            description: {
+                get: () => state.description,
+                set: (value) => state.description = value
+            },
+            priority: {
+                get: () => state.priority,
+                set: (value) => state.priority = value
+            },
+            complete: {
+                get: () => state.complete,
+                set: (value) => state.complete = value
+            },
+            createdDate: {
+                get: () => state.createdDate,
+                set: (value) => state.createdDate = value
+            },
+            dueDate: {
+                get: () => state.dueDate,
+                set: (value) => state.dueDate = value
+            }
+        });
 
         todos.push(newTodo);
         saveTodos();
         return newTodo;
     }
 
-    //save to local stroage
+    // Save to local storage
     function saveTodos() {
-        const todoData = todos.map(todo => todo.getAllInfo())
-        localStorage.setItem('todos', JSON.stringify(todoData))
-        console.log('Todos Saved to Local Storage')
-
+        const todoData = todos.map(todo => todo.getAllInfo());
+        localStorage.setItem('todos', JSON.stringify(todoData));
+        console.log('Todos Saved to Local Storage');
     }
-    //load todo 
+
+    // Load todos
     function loadTodos() {
-
-        const savedTodos = localStorage.getItem('todos')
-
-
+        const savedTodos = localStorage.getItem('todos');
         if (savedTodos) {
-            const todoData = JSON.parse(savedTodos)
-
-            todos = []
-
+            const todoData = JSON.parse(savedTodos);
+            todos = [];
             todoData.forEach(data => {
-
-                //recreate each todo object with methods
+                data.dueDate = data.dueDate ? new Date(data.dueDate) : null; // Restore dueDate
+                data.createdDate = new Date(data.createdDate); // Ensure createdDate is a Date
                 const newTodo = Object.assign(
+                    {},
+                    { 
+                        id: data.id,
+                        title: data.title,
+                        description: data.description,
+                        priority: data.priority,
+                        complete: data.complete,
+                        createdDate: data.createdDate,
+                        dueDate: data.dueDate,
+                        state: data // Include state
+                    },
                     getComplete(data),
                     setComplete(data),
                     getAllInfo(data)
-                )
-                todos.push(newTodo)
-            })
+                );
 
-            // Update todoId counter to prevent ID conflicts
+                // Sync direct properties with state
+                Object.defineProperties(newTodo, {
+                    title: {
+                        get: () => data.title,
+                        set: (value) => data.title = value
+                    },
+                    description: {
+                        get: () => data.description,
+                        set: (value) => data.description = value
+                    },
+                    priority: {
+                        get: () => data.priority,
+                        set: (value) => data.priority = value
+                    },
+                    complete: {
+                        get: () => data.complete,
+                        set: (value) => data.complete = value
+                    },
+                    createdDate: {
+                        get: () => data.createdDate,
+                        set: (value) => data.createdDate = value
+                    },
+                    dueDate: {
+                        get: () => data.dueDate,
+                        set: (value) => data.dueDate = value
+                    }
+                });
+
+                todos.push(newTodo);
+            });
             if (todos.length > 0) {
                 todoId = Math.max(...todos.map(todo => todo.getAllInfo().id));
             }
-
-
-
-
         }
     }
-    //return the functions you want to expose
+
     return {
         createItem: createItem,
         getAllTodos: getAllTodos,
         deleteTodo: deleteTodo,
         saveTodos: saveTodos,
         loadTodos: loadTodos
-    }
+    };
 })();
-
