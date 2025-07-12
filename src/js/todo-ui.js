@@ -1,187 +1,197 @@
 function createTodoCard(todo) {
-        //1. Create the card element
-        let card = document.createElement('div')
-        card.className = 'todo-card'
-        //2. Add todo information (title, desccription, priority)
-        const todoInfo = todo.getAllInfo()
-        card.dataset.todoId = todoInfo.id
+    //1. Create the card element
+    let card = document.createElement('div')
+    card.className = 'todo-card'
+    //2. Add todo information (title, desccription, priority)
+    const todoInfo = todo.getAllInfo()
+    card.dataset.todoId = todoInfo.id
 
-        let title = document.createElement('h2')
-        title.textContent = todoInfo.title
-        card.appendChild(title)
+    let title = document.createElement('h2')
+    title.textContent = todoInfo.title
+    card.appendChild(title)
 
-        let description = document.createElement('p')
-        description.textContent = todoInfo.description
-        card.appendChild(description)
+    let description = document.createElement('p')
+    description.textContent = todoInfo.description
+    card.appendChild(description)
 
-        let status = document.createElement('p')
-        status.textContent = todoInfo.complete ? 'Completed' : 'Pending'
-        status.style.color = todoInfo.complete ? 'green' : 'orange'
-        card.appendChild(status)
-        //3. Addd the three button (delete, cpmplete, edit)
+    let status = document.createElement('p')
+    status.textContent = todoInfo.complete ? 'Completed' : 'Pending'
+    status.style.color = todoInfo.complete ? 'green' : 'orange'
+    card.appendChild(status)
+    //3. Addd the three button (delete, cpmplete, edit)
 
-        let deleteBtn = document.createElement('button')
-        deleteBtn.textContent = 'Delete'
-        deleteBtn.addEventListener('click', function () {
-            //Get the todo ID from the card
-            const todoId = card.dataset.todoId;
+    //create date
+    let createdDate = document.createElement('small')
+    const dateObj = new Date(todoInfo.createdDate);
+    if (isNaN(dateObj)) {
+        createdDate.textContent = 'Created: Unknown date';
+    } else {
+        createdDate.textContent = `Created: ${dateObj.toLocaleDateString()}`;
+    }
+    card.appendChild(createdDate);
 
-            //Delete from TodoManger
-            TodoManager.deleteTodo(todoId)
+    let deleteBtn = document.createElement('button')
+    deleteBtn.textContent = 'Delete'
+    deleteBtn.addEventListener('click', function () {
+        //Get the todo ID from the card
+        const todoId = card.dataset.todoId;
 
-            //Remove card from page
-            card.remove()
+        //Delete from TodoManger
+        TodoManager.deleteTodo(todoId)
 
-            console.log('Todo delted')
+        //Remove card from page
+        card.remove()
 
-        })
+        console.log('Todo delted')
 
-        let completeBtn = document.createElement('button')
-        completeBtn.textContent = 'Complete'
-        completeBtn.addEventListener('click', function () {
-            //Get the todo ID
-            const todoId = card.dataset.todoId
+    })
 
-            //Find the todo and toggle its completion 
-            const allTodos = TodoManager.getAllTodos()
-            const currentTodo = allTodos.find(t => t.getAllInfo().id == todoId)
+    let completeBtn = document.createElement('button')
+    completeBtn.textContent = 'Complete'
+    completeBtn.addEventListener('click', function () {
+        //Get the todo ID
+        const todoId = card.dataset.todoId
 
-            if (currentTodo) {
-                //Toggle completion status
-                currentTodo.setComplete()
+        //Find the todo and toggle its completion 
+        const allTodos = TodoManager.getAllTodos()
+        const currentTodo = allTodos.find(t => t.getAllInfo().id == todoId)
 
-                //Get updated status
-                const isComplete = currentTodo.getAllInfo().complete
+        if (currentTodo) {
+            //Toggle completion status
+            currentTodo.setComplete()
 
-                if(isComplete){
-                    const todoInfo = currentTodo.getAllInfo()
-                    GameManager.giveGoldReward(todoInfo.priority)
-                }
-                //update the status text and color
-                status.textContent = isComplete ? 'Completed' : 'Incomplete'
-                status.style.color = isComplete ? 'green' : 'red'
+            //Get updated status
+            const isComplete = currentTodo.getAllInfo().complete
 
-                //update button
-                completeBtn.textContent = isComplete ? 'Incomplete' : 'Complete'
+            if (isComplete) {
+                const todoInfo = currentTodo.getAllInfo()
+                GameManager.giveGoldReward(todoInfo.priority)
             }
-        })
-        let editBtn = document.createElement('button')
-        editBtn.textContent = 'Edit'
+            //update the status text and color
+            status.textContent = isComplete ? 'Completed' : 'Incomplete'
+            status.style.color = isComplete ? 'green' : 'red'
 
-        editBtn.addEventListener('click', function () {
-            switchToEditMode(title, description, editBtn, card)
-        })
+            //update button
+            completeBtn.textContent = isComplete ? 'Incomplete' : 'Complete'
+        }
+    })
+    let editBtn = document.createElement('button')
+    editBtn.textContent = 'Edit'
 
-        card.appendChild(deleteBtn)
-        card.appendChild(completeBtn)
-        card.appendChild(editBtn)
-        //4. Return the completed card element 
-        return card
-    }
+    editBtn.addEventListener('click', function () {
+        switchToEditMode(title, description, editBtn, card)
+    })
 
-    function displayTodoCard(todo) {
-        const card = createTodoCard(todo)
-        const todosDisplay = document.getElementById('todos-display')
-        todosDisplay.appendChild(card)
-    }
+    card.appendChild(deleteBtn)
+    card.appendChild(completeBtn)
+    card.appendChild(editBtn)
+    //4. Return the completed card element 
+    return card
+}
 
-    function switchToEditMode(titleElement, descElement, editButton, card){
-        //Store original values for cancel functionality
-        const originalTitle = titleElement.textContent 
-        const originalDesc = descElement.textContent
+function displayTodoCard(todo) {
+    const card = createTodoCard(todo)
+    const todosDisplay = document.getElementById('todos-display')
+    todosDisplay.appendChild(card)
+}
 
-        //create input elements 
-        const titleInput = document.createElement('input')
-        titleInput.type = 'text'
-        titleInput.value = originalTitle
+function switchToEditMode(titleElement, descElement, editButton, card) {
+    //Store original values for cancel functionality
+    const originalTitle = titleElement.textContent
+    const originalDesc = descElement.textContent
 
-        const descTextarea = document.createElement('textarea')
-        descTextarea.value = originalDesc 
+    //create input elements 
+    const titleInput = document.createElement('input')
+    titleInput.type = 'text'
+    titleInput.value = originalTitle
 
-        //Replace the text elements with the inputs
-        titleElement.replaceWith(titleInput)
-        descElement.replaceWith(descTextarea)
+    const descTextarea = document.createElement('textarea')
+    descTextarea.value = originalDesc
 
-        //Create Save amd Cancel buttons
-        const saveBtn = document.createElement('button')
-        saveBtn.textContent = 'Save'
+    //Replace the text elements with the inputs
+    titleElement.replaceWith(titleInput)
+    descElement.replaceWith(descTextarea)
 
-        const cancelBtn = document.createElement('button')
-        cancelBtn.textContent = 'Cancel'
+    //Create Save amd Cancel buttons
+    const saveBtn = document.createElement('button')
+    saveBtn.textContent = 'Save'
 
-        //replace the edit button with the save and cancel btuton
-        editButton.replaceWith(saveBtn, cancelBtn)
+    const cancelBtn = document.createElement('button')
+    cancelBtn.textContent = 'Cancel'
 
-        //Add Save functionality
-        saveBtn.addEventListener('click', function(){
-            //save the changes and switch back to display mode
-            //Get new values from inputs
+    //replace the edit button with the save and cancel btuton
+    editButton.replaceWith(saveBtn, cancelBtn)
 
-            const newTitle = titleInput.value.trim()
-            const newDesc = descTextarea.value.trim() //trim the white spaces before and after the word
+    //Add Save functionality
+    saveBtn.addEventListener('click', function () {
+        //save the changes and switch back to display mode
+        //Get new values from inputs
 
-            //validate - don't allow empty title
+        const newTitle = titleInput.value.trim()
+        const newDesc = descTextarea.value.trim() //trim the white spaces before and after the word
 
-            if(!newTitle){
-                alert('Title cannot be empty')
-                return 
-            }
+        //validate - don't allow empty title
 
-            //update todomanager 
-            const todoId = card.dataset.todoId
+        if (!newTitle) {
+            alert('Title cannot be empty')
+            return
+        }
 
-            //Find the todo and toggle its completion 
-            const allTodos = TodoManager.getAllTodos()
-            const currentTodo = allTodos.find(t => t.getAllInfo().id == todoId)
+        //update todomanager 
+        const todoId = card.dataset.todoId
 
-            currentTodo.title = newTitle
-            currentTodo.description = newDesc
+        //Find the todo and toggle its completion 
+        const allTodos = TodoManager.getAllTodos()
+        const currentTodo = allTodos.find(t => t.getAllInfo().id == todoId)
+
+        currentTodo.title = newTitle
+        currentTodo.description = newDesc
 
 
-            //create new display elements with updated values
-            const newTitleElement = document.createElement('h2')
-            newTitleElement.textContent = newTitle 
+        //create new display elements with updated values
+        const newTitleElement = document.createElement('h2')
+        newTitleElement.textContent = newTitle
 
-            const newDescElement = document.createElement('p')
-            newDescElement.textContent = newDesc 
+        const newDescElement = document.createElement('p')
+        newDescElement.textContent = newDesc
 
-            //create new edit button
-            const newEditBtn = document.createElement('button')
-            newEditBtn.textContent = 'Edit'
+        //create new edit button
+        const newEditBtn = document.createElement('button')
+        newEditBtn.textContent = 'Edit'
 
-            //Replace inputs with display elements 
-            titleInput.replaceWith(newTitleElement)
-            descTextarea.replaceWith(newDescElement)
-            saveBtn.replaceWith(newEditBtn)
-            cancelBtn.remove()
+        //Replace inputs with display elements 
+        titleInput.replaceWith(newTitleElement)
+        descTextarea.replaceWith(newDescElement)
+        saveBtn.replaceWith(newEditBtn)
+        cancelBtn.remove()
 
-            //Add edit functionality abck
-            newEditBtn.addEventListener('click', function(){
-                switchToEditMode(newTitleElement,newDescElement, newEditBtn, card)
-            })
-
-        })
-
-        cancelBtn.addEventListener('click', function(){
-            //Discard changes and switch back to display mode
-            const restoredTitle = document.createElement('h2')
-            restoredTitle.textContent = originalTitle
-
-            const restoredDesc = document.createElement('p')
-            restoredDesc.textContent = originalDesc 
-
-            const restoredEditBtn = document.createElement('button')
-            restoredEditBtn.textContent = 'Edit'
-
-            titleInput.replaceWith(restoredTitle)
-            descTextarea.replaceWith(restoredDesc)
-            saveBtn.replaceWith(restoredEditBtn)
-            cancelBtn.remove()
-            //Add edit functionality back
-            restoredEditBtn.addEventListener('click', function(){
-                switchToEditMode(restoredTitle, restoredDesc, restoredEditBtn, card)
-            })
-
+        //Add edit functionality abck
+        newEditBtn.addEventListener('click', function () {
+            switchToEditMode(newTitleElement, newDescElement, newEditBtn, card)
         })
 
-    }
+    })
+
+    cancelBtn.addEventListener('click', function () {
+        //Discard changes and switch back to display mode
+        const restoredTitle = document.createElement('h2')
+        restoredTitle.textContent = originalTitle
+
+        const restoredDesc = document.createElement('p')
+        restoredDesc.textContent = originalDesc
+
+        const restoredEditBtn = document.createElement('button')
+        restoredEditBtn.textContent = 'Edit'
+
+        titleInput.replaceWith(restoredTitle)
+        descTextarea.replaceWith(restoredDesc)
+        saveBtn.replaceWith(restoredEditBtn)
+        cancelBtn.remove()
+        //Add edit functionality back
+        restoredEditBtn.addEventListener('click', function () {
+            switchToEditMode(restoredTitle, restoredDesc, restoredEditBtn, card)
+        })
+
+    })
+
+}

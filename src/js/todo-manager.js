@@ -3,7 +3,7 @@
 
 const TodoManager = (function () {
     let todoId = 0;
-    let todos = []; 
+    let todos = [];
     //check if item is complete
     const getComplete = (state) => ({
         getComplete: () => console.log(state.complete)
@@ -20,23 +20,36 @@ const TodoManager = (function () {
             title: state.title,
             description: state.description,
             priority: state.priority,
-            complete: state.complete
+            complete: state.complete,
+            createdDate: state.createdDate
         })
     })
     //return the whole array
-    function getAllTodos(){
+    function getAllTodos() {
         return todos
     }
 
     //delete todo by id
-    function deleteTodo(id){
-        //find the index of the todo with matching ID
-        const index = todos.findIndex(todo => todo.getAllInfo().id === id); 
+    function deleteTodo(id) {
+        console.log('Trying to delete ID:', id, 'Type:', typeof id);
 
-        if (index !== -1){
-            todos.splice(index,1) // remove 1 item at that index 
+        //find the index of the todo with matching ID
+        const index = todos.findIndex(todo => {
+            const todoId = todo.getAllInfo().id;
+            console.log('Comparing with todo ID:', todoId, 'Type:', typeof todoId);
+            return todoId == id; // Use == instead of ===
+        });
+
+        console.log('Found index:', index);
+
+        if (index !== -1) {
+            todos.splice(index, 1) // remove 1 item at that index 
+            saveTodos()
+            console.log('Todo deleted and saved');
+        } else {
+            console.log('Todo not found!');
         }
-        
+
     }
     function createItem(title, description, priority) {
         todoId++;
@@ -46,7 +59,8 @@ const TodoManager = (function () {
             title: title,
             description: description,
             priority: priority,
-            complete: false
+            complete: false,
+            createdDate: new Date()
         };
 
         const newTodo = Object.assign(
@@ -54,15 +68,58 @@ const TodoManager = (function () {
             setComplete(state),
             getAllInfo(state)
         );
+
+        todos.push(newTodo);
+        saveTodos();
+        return newTodo;
+    }
+
+    //save to local stroage
+    function saveTodos() {
+        const todoData = todos.map(todo => todo.getAllInfo())
+        localStorage.setItem('todos', JSON.stringify(todoData))
+        console.log('Todos Saved to Local Storage')
+
+    }
+    //load todo 
+    function loadTodos() {
+       
+        const savedTodos = localStorage.getItem('todos')
         
-        todos.push(newTodo); 
-        return newTodo; 
+
+        if (savedTodos) {
+            const todoData = JSON.parse(savedTodos)
+
+            todos = []
+
+            todoData.forEach(data => {
+                
+                //recreate each todo object with methods
+                const newTodo = Object.assign(
+                    getComplete(data),
+                    setComplete(data),
+                    getAllInfo(data)
+                )
+                todos.push(newTodo)
+            })
+            
+            // Update todoId counter to prevent ID conflicts
+            if (todos.length > 0) {
+                todoId = Math.max(...todos.map(todo => todo.getAllInfo().id));
+            }
+
+
+
+
+        }
     }
     //return the functions you want to expose
     return {
         createItem: createItem,
         getAllTodos: getAllTodos,
-        deleteTodo: deleteTodo
+        deleteTodo: deleteTodo,
+        saveTodos: saveTodos,
+        loadTodos: loadTodos
     }
 })();
 
