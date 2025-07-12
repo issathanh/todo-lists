@@ -59,7 +59,7 @@ function createTodoCard(todo) {
         if (currentTodo) {
             //Toggle completion status
             currentTodo.setComplete()
-
+            TodoManager.saveTodos(); 
             //Get updated status
             const isComplete = currentTodo.getAllInfo().complete
 

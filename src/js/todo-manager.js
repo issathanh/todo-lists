@@ -7,6 +7,7 @@ const TodoManager = (function () {
     //check if item is complete
     const getComplete = (state) => ({
         getComplete: () => console.log(state.complete)
+
     })
 
     //toggle completion 
@@ -36,8 +37,7 @@ const TodoManager = (function () {
         //find the index of the todo with matching ID
         const index = todos.findIndex(todo => {
             const todoId = todo.getAllInfo().id;
-            console.log('Comparing with todo ID:', todoId, 'Type:', typeof todoId);
-            return todoId == id; // Use == instead of ===
+            return todoId == id; 
         });
 
         console.log('Found index:', index);
@@ -83,9 +83,9 @@ const TodoManager = (function () {
     }
     //load todo 
     function loadTodos() {
-       
+
         const savedTodos = localStorage.getItem('todos')
-        
+
 
         if (savedTodos) {
             const todoData = JSON.parse(savedTodos)
@@ -93,7 +93,7 @@ const TodoManager = (function () {
             todos = []
 
             todoData.forEach(data => {
-                
+
                 //recreate each todo object with methods
                 const newTodo = Object.assign(
                     getComplete(data),
@@ -102,7 +102,7 @@ const TodoManager = (function () {
                 )
                 todos.push(newTodo)
             })
-            
+
             // Update todoId counter to prevent ID conflicts
             if (todos.length > 0) {
                 todoId = Math.max(...todos.map(todo => todo.getAllInfo().id));
